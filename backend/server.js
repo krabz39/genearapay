@@ -50,7 +50,7 @@ app.post("/pay", async (req, res) => {
 
     // 🚀 STK PUSH (REPLACE your old axios.post with this)
     const stk = await axios.post(
-      "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
+      "https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
       {
         BusinessShortCode: process.env.SHORTCODE,
         Password: getPassword(timestamp), // ✅ SAME timestamp
