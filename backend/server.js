@@ -75,8 +75,10 @@ if (amount <= 0) {
     res.json({ success: true, ref });
 
   } catch (err) {
-    console.log(err.response?.data || err.message);
-    res.json({ success: false });
+    console.log("DARJA ERROR:", err.response?.data || err.message);
+    res.json({ success: false, 
+      error: err.response?.data || err.message
+    });
   }
 });
 

@@ -9,11 +9,17 @@ async function pay() {
   const phone = document.getElementById("phone").value;
   const amount = document.getElementById("amount").value;
 
-  const res = await fetch("https://chequematez.co.ke/pay", {
+  const res = await fetch("https://genearapay.onrender.com/pay", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({ phone, amount })
   });
+
+  if (!data.success) {
+  console.error("Payment error:", data.error);
+  alert("Payment failed: " + JSON.stringify(data.error));
+  return;
+}
 
   const data = await res.json();
 
@@ -28,7 +34,7 @@ async function checkStatus(ref, phone, amount) {
 
   const interval = setInterval(async () => {
 
-    const res = await fetch(`https://chequematez.co.ke/status/${ref}`);
+    const res = await fetch(`https://genearapay.onrender.com/status/${ref}`);
     const data = await res.json();
 
     if (data.status === "Success") {
@@ -46,7 +52,7 @@ async function checkStatus(ref, phone, amount) {
       document.getElementById("rDate").innerText = date;
       document.getElementById("rRef").innerText = ref;
 
-      const verify = `https://chequematez.co.ke/verify/${ref}`;
+      const verify = `https://genearapay.onrender.com/verify/${ref}`;
       document.getElementById("verifyLink").innerText = verify;
 
       document.getElementById("qr").src = data.qr;
