@@ -27,7 +27,10 @@ app.post("/pay", async (req, res) => {
   try {
     let { phone, amount } = req.body;
 
-    // Normalize phone
+    // ✅ FIX PHONE FORMAT (PUT IT HERE)
+    if (phone.startsWith("+")) {
+      phone = phone.replace("+", "");
+    }
     if (phone.startsWith("0")) {
       phone = "254" + phone.substring(1);
     }
@@ -47,7 +50,7 @@ app.post("/pay", async (req, res) => {
 
     // 🚀 STK PUSH (REPLACE your old axios.post with this)
     const stk = await axios.post(
-      "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+      "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
       {
         BusinessShortCode: process.env.SHORTCODE,
         Password: getPassword(timestamp), // ✅ SAME timestamp

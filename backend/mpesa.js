@@ -3,7 +3,7 @@ const axios = require("axios");
 /* 🔑 GET ACCESS TOKEN */
 async function getToken() {
   const url =
-    "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
+    "https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials";
 
   const auth = Buffer.from(
     `${process.env.CONSUMER_KEY}:${process.env.CONSUMER_SECRET}`
@@ -17,6 +17,7 @@ async function getToken() {
 
   // 👇 ADD THIS
   console.log("FULL TOKEN RESPONSE:", res.data);
+  console.log("SHORTCODE:", process.env.SHORTCODE);
 
   return res.data.access_token;
 }
