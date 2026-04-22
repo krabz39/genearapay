@@ -15,6 +15,9 @@ async function getToken() {
     },
   });
 
+  // 👇 ADD THIS
+  console.log("FULL TOKEN RESPONSE:", res.data);
+
   return res.data.access_token;
 }
 
