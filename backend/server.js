@@ -71,6 +71,8 @@ app.post("/pay", async (req, res) => {
       }
     );
 
+    console.log("STK RESPONSE:", stk.data);
+    
     const checkoutId = stk.data.CheckoutRequestID;
 
     // SAVE TO DB
