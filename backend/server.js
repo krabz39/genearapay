@@ -29,27 +29,29 @@ app.post("/pay", async (req, res) => {
 
     // Normalize phone
     if (phone.startsWith("0")) {
-  phone = "254" + phone.substring(1);
-}
+      phone = "254" + phone.substring(1);
+    }
 
     const ref = "GEN-" + Date.now();
 
+    // 🔑 GET TOKEN
     const token = await getToken();
 
-    if (!phone || !amount) {
-  return res.json({ success: false, message: "Missing fields" });
-}
+    // 🧪 DEBUG LOGS (PUT HERE)
+    console.log("TOKEN:", token);
+    console.log("PHONE:", phone);
+    console.log("AMOUNT:", amount);
 
-if (amount <= 0) {
-  return res.json({ success: false, message: "Invalid amount" });
-}
+    // ⏱ CREATE ONE TIMESTAMP (VERY IMPORTANT)
+    const timestamp = getTimestamp();
 
+    // 🚀 STK PUSH (REPLACE your old axios.post with this)
     const stk = await axios.post(
       "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
       {
         BusinessShortCode: process.env.SHORTCODE,
-        Password: getPassword(),
-        Timestamp: getTimestamp(),
+        Password: getPassword(timestamp), // ✅ SAME timestamp
+        Timestamp: timestamp,             // ✅ SAME timestamp
         TransactionType: "CustomerPayBillOnline",
         Amount: amount,
         PartyA: phone,
@@ -60,12 +62,15 @@ if (amount <= 0) {
         TransactionDesc: "Payment",
       },
       {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
 
     const checkoutId = stk.data.CheckoutRequestID;
 
+    // SAVE TO DB
     await pool.query(
       `INSERT INTO transactions (ref, phone, amount, status, checkout_id)
        VALUES ($1,$2,$3,$4,$5)`,
@@ -76,7 +81,9 @@ if (amount <= 0) {
 
   } catch (err) {
     console.log("DARJA ERROR:", err.response?.data || err.message);
-    res.json({ success: false, 
+
+    res.json({
+      success: false,
       error: err.response?.data || err.message
     });
   }
