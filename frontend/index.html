@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geneara Pay</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- LEFT -->
+  <div class="left">
+    <div class="card">
+
+      <h1 class="logo">Geneara <span>Pay</span></h1>
+
+      <h2>Make a Payment</h2>
+      <p class="sub">Fast. Secure. M-Pesa powered.</p>
+
+      <label>Amount (KES)</label>
+      <input id="amount" type="number" placeholder="Enter amount">
+
+      <label>Phone Number</label>
+      <input id="phone" type="text" placeholder="e.g. 0712345678">
+
+      <div class="info-box">
+        You’ll receive an M-Pesa prompt. Enter your PIN to complete.
+      </div>
+
+      <button id="payBtn" onclick="pay()">
+        <span id="btnText">Pay Now</span>
+        <div id="loader" class="loader"></div>
+      </button>
+
+      <p class="secure">🔒 Secure payments via M-Pesa</p>
+
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+
+    <!-- EMPTY STATE -->
+    <div id="emptyState" class="empty">
+      <h3>Awaiting Payment</h3>
+      <p>Your receipt will appear here after payment</p>
+    </div>
+
+    <!-- RECEIPT -->
+    <div id="receiptBox" class="receipt-card hidden">
+
+      <div class="success-icon">✓</div>
+      <h2>Payment Successful</h2>
+
+      <div class="receipt">
+        <p><span>Amount</span><b id="rAmount"></b></p>
+        <p><span>Phone</span><b id="rPhone"></b></p>
+        <p><span>Receipt</span><b id="rReceipt"></b></p>
+        <p><span>Date</span><b id="rDate"></b></p>
+        <p><span>Reference</span><b id="rRef"></b></p>
+      </div>
+
+      <img id="qr"/>
+
+      <p id="verifyLink"></p>
+
+      <button onclick="window.print()">Print Receipt</button>
+
+      <a id="waLink" target="_blank">
+        <button class="whatsapp">Share via WhatsApp</button>
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

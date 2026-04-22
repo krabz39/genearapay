@@ -1,0 +1,191 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #f5f5f5, #e8f5e9);
+}
+
+/* LAYOUT */
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* PANELS */
+.left, .right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* CARD */
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* LOGO */
+.logo {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.logo span {
+  color: #2e7d32;
+}
+
+/* TEXT */
+.sub {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+/* INPUT */
+input {
+  width: 100%;
+  padding: 14px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  transition: 0.2s;
+}
+
+input:focus {
+  border-color: #2e7d32;
+  outline: none;
+}
+
+/* BUTTON */
+button {
+  width: 100%;
+  padding: 15px;
+  background: #2e7d32;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  margin-top: 15px;
+  font-size: 16px;
+  cursor: pointer;
+  position: relative;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+/* LOADER */
+.loader {
+  display: none;
+  border: 3px solid #fff;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* INFO */
+.info-box {
+  background: #eef7ee;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* RIGHT PANEL */
+.empty {
+  text-align: center;
+  color: #888;
+}
+
+/* RECEIPT */
+.receipt-card {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.hidden {
+  display: none;
+}
+
+/* SUCCESS ICON */
+.success-icon {
+  width: 60px;
+  height: 60px;
+  background: #2e7d32;
+  color: white;
+  font-size: 30px;
+  line-height: 60px;
+  border-radius: 50%;
+  margin: 0 auto 10px;
+}
+
+/* RECEIPT TABLE */
+.receipt {
+  margin-top: 20px;
+}
+
+.receipt p {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+}
+
+/* QR */
+#qr {
+  width: 140px;
+  margin: 20px auto;
+}
+
+/* VERIFY */
+#verifyLink {
+  font-size: 12px;
+  word-break: break-all;
+}
+
+/* WHATSAPP */
+.whatsapp {
+  background: #25D366;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+}
+
+/* PRINT */
+@media print {
+  .left {
+    display: none;
+  }
+
+  button {
+    display: none;
+  }
+}
