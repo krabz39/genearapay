@@ -8,8 +8,19 @@ const QRCode = require("qrcode");
 const crypto = require("crypto");
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    "https://chequematez.co.ke",
+    "https://www.chequematez.co.ke"
+  ],
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type"]
+}));
 app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send("Geneara Pay API Live ✅");
+});
 
 /* CREATE PAYMENT */
 app.post("/pay", async (req, res) => {
@@ -17,11 +28,21 @@ app.post("/pay", async (req, res) => {
     let { phone, amount } = req.body;
 
     // Normalize phone
-    phone = phone.replace(/^0/, "254");
+    if (phone.startsWith("0")) {
+  phone = "254" + phone.substring(1);
+}
 
     const ref = "GEN-" + Date.now();
 
     const token = await getToken();
+
+    if (!phone || !amount) {
+  return res.json({ success: false, message: "Missing fields" });
+}
+
+if (amount <= 0) {
+  return res.json({ success: false, message: "Invalid amount" });
+}
 
     const stk = await axios.post(
       "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
