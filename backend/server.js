@@ -55,7 +55,7 @@ app.post("/pay", async (req, res) => {
         BusinessShortCode: process.env.SHORTCODE,
         Password: getPassword(timestamp), // ✅ SAME timestamp
         Timestamp: timestamp,             // ✅ SAME timestamp
-        TransactionType: "CustomerPayBillOnline",
+        TransactionType: "CustomerBuyGoodsOnline",
         Amount: amount,
         PartyA: phone,
         PartyB: process.env.SHORTCODE,
