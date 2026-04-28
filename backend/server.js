@@ -119,20 +119,22 @@ app.post("/callback", async (req, res) => {
     );
 
     // ⏳ AUTO TIMEOUT AFTER 60s (fallback system)
+const currentRef = ref; // 🔥 capture ref safely
+
 setTimeout(async () => {
   try {
     const { rows } = await pool.query(
       "SELECT status FROM transactions WHERE ref=$1",
-      [ref]
+      [currentRef]
     );
 
     if (rows.length && rows[0].status === "Pending") {
       await pool.query(
         "UPDATE transactions SET status='Timeout' WHERE ref=$1",
-        [ref]
+        [currentRef]
       );
 
-      console.log("⏳ Transaction timed out:", ref);
+      console.log("⏳ Transaction timed out:", currentRef);
     }
   } catch (err) {
     console.log("Timeout update error:", err.message);

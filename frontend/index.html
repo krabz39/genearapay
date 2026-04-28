@@ -49,46 +49,63 @@
     </div>
 
     <!-- RECEIPT -->
-    <div id="receiptBox" class="receipt-card hidden">
+<div id="receiptBox" class="receipt-card hidden">
 
-      <div class="success-icon">✓</div>
+  <!-- HEADER -->
+  <div class="receipt-header">
+    <div class="icon" id="statusIcon">✓</div>
+    <div>
       <h2 id="receiptTitle">Payment Status</h2>
+      <p id="receiptSub">Processing your payment...</p>
+    </div>
+  </div>
 
-      <div class="receipt">
-  <p><span>Amount</span><b id="rAmount"></b></p>
-  <p><span>Phone</span><b id="rPhone"></b></p>
-  <p><span>Receipt</span><b id="rReceipt"></b></p>
-  <p><span>Date</span><b id="rDate"></b></p>
-  <p><span>Reference</span><b id="rRef"></b></p>
+  <!-- BODY -->
+  <div class="receipt-body">
 
-  <!-- 🔥 NEW STATUS LINE -->
-  <p><span>Status</span><b id="rStatus"></b></p>
-</div>
-<!-- 🔥 MANUAL PAYMENT FALLBACK -->
-<div id="manualInstructions" style="display:none; margin-top:15px; padding:10px; background:#fff3cd; border-radius:8px;">
-  <p><strong>Complete Payment Manually</strong></p>
-  <p>Go to M-Pesa → Buy Goods</p>
-  <p><b>Till Number: 6249681</b></p>
-  <p>Then click the button below</p>
-</div>
+    <!-- LEFT DETAILS -->
+    <div class="receipt-left">
+      <p><span>Amount</span><b id="rAmount"></b></p>
+      <p><span>Phone</span><b id="rPhone"></b></p>
+      <p><span>Receipt</span><b id="rReceipt"></b></p>
+      <p><span>Date</span><b id="rDate"></b></p>
+      <p><span>Reference</span><b id="rRef"></b></p>
+      <p><span>Status</span><b id="rStatus"></b></p>
 
-<button id="manualPayBtn" onclick="manualVerify()" style="display:none; margin-top:10px;">
-  I have paid manually
-</button>
+      <p class="verify">
+        Verify: <span id="verifyLink"></span>
+      </p>
+    </div>
 
+    <!-- RIGHT QR -->
+    <div class="receipt-right">
       <img id="qr"/>
-
-      <p id="verifyLink"></p>
-
-      <button onclick="window.print()">Print Receipt</button>
-
-      <a id="waLink" target="_blank">
-        <button class="whatsapp">Share via WhatsApp</button>
-      </a>
-
+      <p class="scan">Scan to verify</p>
     </div>
 
   </div>
+
+  <!-- MANUAL PAYMENT -->
+  <div id="manualInstructions" class="manual-box" style="display:none;">
+    <p><strong>Complete Payment Manually</strong></p>
+    <p>Go to M-Pesa → Buy Goods</p>
+    <p><b>Till Number: 6249681</b></p>
+
+    <button id="manualPayBtn" onclick="manualVerify()">
+      I have paid manually
+    </button>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button onclick="window.print()">Print Receipt</button>
+
+    <a id="waLink" target="_blank">
+      <button class="whatsapp">Share via WhatsApp</button>
+    </a>
+  </div>
+
+</div>
 
 </div>
 

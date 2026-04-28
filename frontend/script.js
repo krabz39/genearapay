@@ -113,9 +113,18 @@ function showReceipt(data, ref, phone, amount, status) {
 const manualBtn = document.getElementById("manualPayBtn");
 const instructions = document.getElementById("manualInstructions");
 
-  if (status === "SUCCESS") {
+// 🔥 HEADER UI ELEMENTS
+const title = document.getElementById("receiptTitle");
+const sub = document.getElementById("receiptSub");
+const icon = document.getElementById("statusIcon");
+
+ if (status === "SUCCESS") {
   statusEl.innerText = "SUCCESS ✅";
   statusEl.style.color = "green";
+
+  title.innerText = "Payment Successful";
+  sub.innerText = "Your payment was successful";
+  icon.style.background = "#2e7d32";
 
   manualBtn.style.display = "none";
   instructions.style.display = "none";
@@ -124,12 +133,20 @@ else if (status === "FAILED") {
   statusEl.innerText = "FAILED ❌";
   statusEl.style.color = "red";
 
+  title.innerText = "Payment Failed";
+  sub.innerText = "Something went wrong";
+  icon.style.background = "red";
+
   manualBtn.style.display = "none";
   instructions.style.display = "none";
 }
 else if (status === "TIMEOUT") {
   statusEl.innerText = "TIMED OUT ⏳";
   statusEl.style.color = "orange";
+
+  title.innerText = "Timed Out";
+  sub.innerText = "Complete payment manually";
+  icon.style.background = "orange";
 
   manualBtn.style.display = "block";
   instructions.style.display = "block";
@@ -138,17 +155,10 @@ else {
   statusEl.innerText = "AWAITING CONFIRMATION ⏳";
   statusEl.style.color = "orange";
 
+  title.innerText = "Awaiting Payment";
+  sub.innerText = "Complete payment manually if needed";
+  icon.style.background = "orange";
+
   manualBtn.style.display = "block";
   instructions.style.display = "block";
 }}
-let currentRef = null;
-let currentPhone = null;
-let currentAmount = null;
-
-function manualVerify() {
-  if (!currentRef) return;
-
-  alert("Checking payment...");
-
-  checkStatus(currentRef, currentPhone, currentAmount);
-}
