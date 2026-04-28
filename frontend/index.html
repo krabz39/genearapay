@@ -52,15 +52,29 @@
     <div id="receiptBox" class="receipt-card hidden">
 
       <div class="success-icon">✓</div>
-      <h2>Payment Successful</h2>
+      <h2 id="receiptTitle">Payment Status</h2>
 
       <div class="receipt">
-        <p><span>Amount</span><b id="rAmount"></b></p>
-        <p><span>Phone</span><b id="rPhone"></b></p>
-        <p><span>Receipt</span><b id="rReceipt"></b></p>
-        <p><span>Date</span><b id="rDate"></b></p>
-        <p><span>Reference</span><b id="rRef"></b></p>
-      </div>
+  <p><span>Amount</span><b id="rAmount"></b></p>
+  <p><span>Phone</span><b id="rPhone"></b></p>
+  <p><span>Receipt</span><b id="rReceipt"></b></p>
+  <p><span>Date</span><b id="rDate"></b></p>
+  <p><span>Reference</span><b id="rRef"></b></p>
+
+  <!-- 🔥 NEW STATUS LINE -->
+  <p><span>Status</span><b id="rStatus"></b></p>
+</div>
+<!-- 🔥 MANUAL PAYMENT FALLBACK -->
+<div id="manualInstructions" style="display:none; margin-top:15px; padding:10px; background:#fff3cd; border-radius:8px;">
+  <p><strong>Complete Payment Manually</strong></p>
+  <p>Go to M-Pesa → Buy Goods</p>
+  <p><b>Till Number: 6249681</b></p>
+  <p>Then click the button below</p>
+</div>
+
+<button id="manualPayBtn" onclick="manualVerify()" style="display:none; margin-top:10px;">
+  I have paid manually
+</button>
 
       <img id="qr"/>
 

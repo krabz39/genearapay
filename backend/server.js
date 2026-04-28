@@ -118,6 +118,27 @@ app.post("/callback", async (req, res) => {
       [status, receipt, checkoutId]
     );
 
+    // ⏳ AUTO TIMEOUT AFTER 60s (fallback system)
+setTimeout(async () => {
+  try {
+    const { rows } = await pool.query(
+      "SELECT status FROM transactions WHERE ref=$1",
+      [ref]
+    );
+
+    if (rows.length && rows[0].status === "Pending") {
+      await pool.query(
+        "UPDATE transactions SET status='Timeout' WHERE ref=$1",
+        [ref]
+      );
+
+      console.log("⏳ Transaction timed out:", ref);
+    }
+  } catch (err) {
+    console.log("Timeout update error:", err.message);
+  }
+}, 60000); // 60 seconds
+
     res.json({ ResultCode: 0 });
 
   } catch (err) {
@@ -140,11 +161,11 @@ app.get("/status/:ref", async (req, res) => {
 
   const qr = await QRCode.toDataURL(verifyUrl);
 
-  res.json({
-    status: tx.status,
-    mpesaReceipt: tx.mpesa_receipt,
-    qr
-  });
+res.json({
+  status: tx.status,
+  mpesaReceipt: tx.mpesa_receipt || null,
+  qr
+});
 });
 
 /* VERIFY PAGE */

@@ -35,6 +35,9 @@ async function pay() {
 
     // Continue if success
     checkStatus(data.ref, phone, amount);
+    currentRef = data.ref;
+    currentPhone = phone;
+    currentAmount = amount;
 
   } catch (err) {
     console.error("Fetch error:", err);
@@ -46,43 +49,106 @@ async function pay() {
 }
 
 async function checkStatus(ref, phone, amount) {
+  let attempts = 0;
 
   const interval = setInterval(async () => {
+    attempts++;
 
     const res = await fetch(`https://genearapay.onrender.com/status/${ref}`);
     const data = await res.json();
 
+    // ✅ SUCCESS
     if (data.status === "Success") {
-
       clearInterval(interval);
+      showReceipt(data, ref, phone, amount, "SUCCESS");
+    }
 
-      document.getElementById("emptyState").style.display = "none";
-      document.getElementById("receiptBox").classList.remove("hidden");
+    // ❌ FAILED
+    else if (data.status === "Failed") {
+      clearInterval(interval);
+      showReceipt(data, ref, phone, amount, "FAILED");
+    }
 
-      const date = new Date().toLocaleString();
+    // ⏳ BACKEND TIMEOUT
+    else if (data.status === "Timeout") {
+      clearInterval(interval);
+      showReceipt(data, ref, phone, amount, "TIMEOUT");
+    }
 
-      document.getElementById("rAmount").innerText = "KES " + amount;
-      document.getElementById("rPhone").innerText = phone;
-      document.getElementById("rReceipt").innerText = data.mpesaReceipt;
-      document.getElementById("rDate").innerText = date;
-      document.getElementById("rRef").innerText = ref;
-
-      const verify = `https://genearapay.onrender.com/verify/${ref}`;
-      document.getElementById("verifyLink").innerText = verify;
-
-      document.getElementById("qr").src = data.qr;
-
-      const msg = `Geneara Pay Receipt ✅
-Amount: KES ${amount}
-Phone: ${phone}
-Receipt: ${data.mpesaReceipt}
-
-Verify: ${verify}`;
-
-      document.getElementById("waLink").href =
-        `https://wa.me/?text=${encodeURIComponent(msg)}`;
-
+    // ⏳ FRONTEND TIMEOUT (~30s)
+    else if (attempts >= 10) {
+      clearInterval(interval);
+      showReceipt(
+        { mpesaReceipt: null, qr: null },
+        ref,
+        phone,
+        amount,
+        "PENDING"
+      );
     }
 
   }, 3000);
+}
+function showReceipt(data, ref, phone, amount, status) {
+  document.getElementById("emptyState").style.display = "none";
+  document.getElementById("receiptBox").classList.remove("hidden");
+
+  const date = new Date().toLocaleString();
+
+  document.getElementById("rAmount").innerText = "KES " + amount;
+  document.getElementById("rPhone").innerText = phone;
+  document.getElementById("rReceipt").innerText =
+    data.mpesaReceipt || "-";
+  document.getElementById("rDate").innerText = date;
+  document.getElementById("rRef").innerText = ref;
+
+  const verify = `https://genearapay.onrender.com/verify/${ref}`;
+  document.getElementById("verifyLink").innerText = verify;
+
+  if (data.qr) {
+    document.getElementById("qr").src = data.qr;
+  }
+
+  const statusEl = document.getElementById("rStatus");
+const manualBtn = document.getElementById("manualPayBtn");
+const instructions = document.getElementById("manualInstructions");
+
+  if (status === "SUCCESS") {
+  statusEl.innerText = "SUCCESS ✅";
+  statusEl.style.color = "green";
+
+  manualBtn.style.display = "none";
+  instructions.style.display = "none";
+}
+else if (status === "FAILED") {
+  statusEl.innerText = "FAILED ❌";
+  statusEl.style.color = "red";
+
+  manualBtn.style.display = "none";
+  instructions.style.display = "none";
+}
+else if (status === "TIMEOUT") {
+  statusEl.innerText = "TIMED OUT ⏳";
+  statusEl.style.color = "orange";
+
+  manualBtn.style.display = "block";
+  instructions.style.display = "block";
+}
+else {
+  statusEl.innerText = "AWAITING CONFIRMATION ⏳";
+  statusEl.style.color = "orange";
+
+  manualBtn.style.display = "block";
+  instructions.style.display = "block";
+}}
+let currentRef = null;
+let currentPhone = null;
+let currentAmount = null;
+
+function manualVerify() {
+  if (!currentRef) return;
+
+  alert("Checking payment...");
+
+  checkStatus(currentRef, currentPhone, currentAmount);
 }
