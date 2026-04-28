@@ -33,6 +33,18 @@ async function pay() {
       return;
     }
 
+    // 🔥 SHOW RECEIPT IMMEDIATELY
+document.getElementById("emptyState").style.display = "none";
+document.getElementById("receiptBox").classList.remove("hidden");
+
+// Initial state (pending)
+showReceipt(
+  { mpesaReceipt: null, qr: null },
+  data.ref,
+  phone,
+  amount,
+  "PENDING"
+);
     // Continue if success
     checkStatus(data.ref, phone, amount);
     currentRef = data.ref;
