@@ -34,7 +34,8 @@ async function pay() {
     }
 
     // 🔥 SHOW RECEIPT IMMEDIATELY
-document.getElementById("emptyState").style.display = "none";
+const empty = document.getElementById("emptyState");
+empty.style.display = "none";
 document.getElementById("receiptBox").classList.remove("hidden");
 
 // Initial state (pending)
@@ -103,7 +104,9 @@ async function checkStatus(ref, phone, amount) {
 }
 function showReceipt(data, ref, phone, amount, status) {
   document.getElementById("emptyState").style.display = "none";
-  document.getElementById("receiptBox").classList.remove("hidden");
+  const receipt = document.getElementById("receiptBox");
+receipt.classList.remove("hidden");
+receipt.style.display = "block"; // 🔥 FORCE VISIBILITY
 
   const date = new Date().toLocaleString();
 
