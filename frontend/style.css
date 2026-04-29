@@ -271,3 +271,10 @@ button:hover {
   background: #25D366;
   color: white;
 }
+#manualReceipt {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}

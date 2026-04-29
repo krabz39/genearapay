@@ -165,6 +165,60 @@ res.json({
   qr
 });
 });
+/* MANUAL VERIFY */
+app.post("/manual-verify", async (req, res) => {
+  try {
+    let { ref, receipt } = req.body;
+
+    // ❌ Missing data
+    if (!ref || !receipt) {
+      return res.json({ success: false, message: "Missing data" });
+    }
+
+    // 🔒 Normalize receipt
+    receipt = receipt.trim().toUpperCase();
+
+    // 🔒 Validate format (M-Pesa code)
+    if (!/^[A-Z0-9]{8,12}$/.test(receipt)) {
+      return res.json({ success: false, message: "Invalid receipt format" });
+    }
+
+    // 🚫 Prevent reuse
+    const existing = await pool.query(
+      "SELECT * FROM transactions WHERE mpesa_receipt=$1",
+      [receipt]
+    );
+
+    if (existing.rows.length) {
+      return res.json({ success: false, message: "Receipt already used" });
+    }
+
+    // ✅ Update transaction SAFELY
+    const resultUpdate = await pool.query(
+      `UPDATE transactions
+       SET status='Success', mpesa_receipt=$1
+       WHERE ref=$2 AND status != 'Success'
+       RETURNING *`,
+      [receipt, ref]
+    );
+
+    // ❌ If nothing updated
+    if (!resultUpdate.rows.length) {
+      return res.json({
+        success: false,
+        message: "Transaction not found or already completed"
+      });
+    }
+
+    // ✅ Success
+    res.json({ success: true });
+
+  } catch (err) {
+    console.log("Manual verify error:", err.message);
+    res.json({ success: false });
+  }
+});
+
 
 /* VERIFY PAGE */
 app.get("/verify/:ref", async (req, res) => {

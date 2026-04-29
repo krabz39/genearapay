@@ -86,15 +86,24 @@
   </div>
 
   <!-- MANUAL PAYMENT -->
-  <div id="manualInstructions" class="manual-box">
-    <p><strong>Complete Payment Manually</strong></p>
-    <p>Go to M-Pesa → Buy Goods</p>
-    <p><b>Till Number: 6249681</b></p>
+<div id="manualInstructions" class="manual-box">
 
-    <button id="manualPayBtn" onclick="manualVerify()">
-      I have paid manually
-    </button>
-  </div>
+  <p><strong>Pay via M-Pesa</strong></p>
+  <p>Go to: Lipa na M-Pesa → Buy Goods</p>
+  <p><b>Till Number: 6249681</b></p>
+
+  <!-- 🔥 ADD THIS INPUT -->
+  <input 
+    id="manualReceipt" 
+    type="text" 
+    placeholder="Enter M-Pesa Code (e.g QHG7X12345)" 
+  />
+
+  <button id="manualPayBtn" onclick="manualVerify()">
+    I have paid manually
+  </button>
+
+</div>
 
   <!-- ACTIONS -->
   <div class="actions">

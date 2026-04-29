@@ -1,17 +1,14 @@
 async function pay() {
   try {
-    const btn = document.getElementById("payBtn");
     const loader = document.getElementById("loader");
     const text = document.getElementById("btnText");
 
-    // UI loading state
     loader.style.display = "block";
     text.innerText = "Processing...";
 
     const phone = document.getElementById("phone").value;
     const amount = document.getElementById("amount").value;
 
-    // Call backend
     const res = await fetch("https://genearapay.onrender.com/pay", {
       method: "POST",
       headers: {
@@ -20,66 +17,45 @@ async function pay() {
       body: JSON.stringify({ phone, amount })
     });
 
-    // Parse response
     const data = await res.json();
 
-    // Handle failure
     if (!data.success) {
-      console.error("Payment error:", data.error);
       alert("Payment failed: " + JSON.stringify(data.error));
-
       loader.style.display = "none";
       text.innerText = "Pay Now";
       return;
     }
 
-    // 🔥 SHOW RECEIPT IMMEDIATELY
-const empty = document.getElementById("emptyState");
-empty.style.display = "none";
-document.getElementById("receiptBox").classList.remove("hidden");
+    // ✅ SHOW RECEIPT IMMEDIATELY
+    document.getElementById("emptyState").style.display = "none";
 
-// Initial state (pending)
-showReceipt(
-  { mpesaReceipt: null, qr: null },
-  data.ref,
-  phone,
-  amount,
-  "PENDING"
-);
-// 🔥 SHOW RECEIPT + MANUAL PAYMENT IMMEDIATELY
-document.getElementById("emptyState").style.display = "none";
+    const receiptBox = document.getElementById("receiptBox");
+    receiptBox.classList.remove("hidden");
+    receiptBox.style.display = "block";
 
-const receipt = document.getElementById("receiptBox");
-receipt.classList.remove("hidden");
-receipt.style.display = "block";
+    // ✅ SHOW MANUAL FLOW IMMEDIATELY
+    document.getElementById("manualInstructions").style.display = "block";
 
-// 👇 SHOW MANUAL BOX
-document.getElementById("manualInstructions").style.display = "block";
+    showReceipt(
+      { mpesaReceipt: null, qr: null },
+      data.ref,
+      phone,
+      amount,
+      "PENDING"
+    );
 
-// 👇 Initial receipt state
-showReceipt(
-  { mpesaReceipt: null, qr: null },
-  data.ref,
-  phone,
-  amount,
-  "PENDING"
-);
-    // Continue if success
-    checkStatus(data.ref, phone, amount);
-    currentRef = data.ref;
-    currentPhone = phone;
-    currentAmount = amount;
+    // 🔥 USE SMART CHECK (REPLACE OLD checkStatus)
+    smartCheckStatus(data.ref, phone, amount);
 
   } catch (err) {
-    console.error("Fetch error:", err);
-    alert("Network error. Please try again.");
+    alert("Network error");
 
     document.getElementById("loader").style.display = "none";
     document.getElementById("btnText").innerText = "Pay Now";
   }
 }
 
-async function checkStatus(ref, phone, amount) {
+async function smartCheckStatus(ref, phone, amount) {
   let attempts = 0;
 
   const interval = setInterval(async () => {
@@ -100,22 +76,23 @@ async function checkStatus(ref, phone, amount) {
       showReceipt(data, ref, phone, amount, "FAILED");
     }
 
-    // ⏳ BACKEND TIMEOUT
-    else if (data.status === "Timeout") {
+    // 🔥 AUTO SWITCH TO MANUAL
+    else if (
+      data.status === "ManualRequired" ||
+      data.status === "Timeout" ||
+      attempts >= 5
+    ) {
       clearInterval(interval);
-      showReceipt(data, ref, phone, amount, "TIMEOUT");
-    }
 
-    // ⏳ FRONTEND TIMEOUT (~30s)
-    else if (attempts >= 10) {
-      clearInterval(interval);
       showReceipt(
         { mpesaReceipt: null, qr: null },
         ref,
         phone,
         amount,
-        "PENDING"
+        "TIMEOUT"
       );
+
+      document.getElementById("manualInstructions").style.display = "block";
     }
 
   }, 3000);
@@ -197,18 +174,39 @@ else {
 }}
 async function manualVerify() {
   const ref = document.getElementById("rRef").innerText;
+  let receipt = document.getElementById("manualReceipt").value;
+
+  if (!receipt) {
+    alert("Enter M-Pesa code");
+    return;
+  }
+
+  receipt = receipt.trim().toUpperCase();
 
   try {
-    const res = await fetch(`https://genearapay.onrender.com/status/${ref}`);
+    const res = await fetch("https://genearapay.onrender.com/manual-verify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ ref, receipt })
+    });
+
     const data = await res.json();
 
-    if (data.status === "Success") {
-      showReceipt(data, ref, null, null, "SUCCESS");
+    if (data.success) {
+      showReceipt(
+        { mpesaReceipt: receipt },
+        ref,
+        null,
+        null,
+        "SUCCESS"
+      );
     } else {
-      alert("Payment not confirmed yet. Try again in a few seconds.");
+      alert(data.message || "Verification failed");
     }
 
   } catch (err) {
-    alert("Verification failed");
+    alert("Verification error");
   }
 }
