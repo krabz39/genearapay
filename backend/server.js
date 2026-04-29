@@ -115,15 +115,27 @@ app.post("/callback", async (req, res) => {
       if (i.Name === "MpesaReceiptNumber") receipt = i.Value;
     });
 
-    const status = result.ResultCode === 0 ? "Success" : "Failed";
+    let status = "Pending";
 
-    await pool.query(
-      `UPDATE transactions
-       SET status=$1, mpesa_receipt=$2
-       WHERE checkout_id=$3`,
-      [status, receipt, checkoutId]
-    );
-
+if (result.ResultCode === 0) {
+  status = "Success";
+} else if (result.ResultCode === 1032) {
+  status = "Cancelled"; // user cancelled
+} else if (result.ResultCode === 1) {
+  status = "Insufficient"; // insufficient funds
+} else if (result.ResultCode === 2001) {
+  status = "InvalidPIN";
+} else if (result.ResultCode === 2002) {
+  status = "ManualRequired"; // 🔥 YOUR CASE
+} else {
+  status = "Failed";
+}
+  await pool.query(
+  `UPDATE transactions
+   SET status=$1, mpesa_receipt=$2, result_code=$3
+   WHERE checkout_id=$4`,
+  [status, receipt, result.ResultCode, checkoutId]
+);
 
     res.json({ ResultCode: 0 });
 

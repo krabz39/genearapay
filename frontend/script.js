@@ -46,6 +46,24 @@ showReceipt(
   amount,
   "PENDING"
 );
+// 🔥 SHOW RECEIPT + MANUAL PAYMENT IMMEDIATELY
+document.getElementById("emptyState").style.display = "none";
+
+const receipt = document.getElementById("receiptBox");
+receipt.classList.remove("hidden");
+receipt.style.display = "block";
+
+// 👇 SHOW MANUAL BOX
+document.getElementById("manualInstructions").style.display = "block";
+
+// 👇 Initial receipt state
+showReceipt(
+  { mpesaReceipt: null, qr: null },
+  data.ref,
+  phone,
+  amount,
+  "PENDING"
+);
     // Continue if success
     checkStatus(data.ref, phone, amount);
     currentRef = data.ref;
@@ -177,3 +195,20 @@ else {
   manualBtn.style.display = "block";
   instructions.style.display = "block";
 }}
+async function manualVerify() {
+  const ref = document.getElementById("rRef").innerText;
+
+  try {
+    const res = await fetch(`https://genearapay.onrender.com/status/${ref}`);
+    const data = await res.json();
+
+    if (data.status === "Success") {
+      showReceipt(data, ref, null, null, "SUCCESS");
+    } else {
+      alert("Payment not confirmed yet. Try again in a few seconds.");
+    }
+
+  } catch (err) {
+    alert("Verification failed");
+  }
+}
