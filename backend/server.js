@@ -166,26 +166,27 @@ res.json({
 });
 });
 /* MANUAL VERIFY */
+/* MANUAL VERIFY (SECURE PRODUCTION VERSION) */
 app.post("/manual-verify", async (req, res) => {
   try {
-    let { ref, receipt } = req.body;
+    let { ref, receipt, phone, amount } = req.body;
 
     // ❌ Missing data
-    if (!ref || !receipt) {
+    if (!ref || !receipt || !phone || !amount) {
       return res.json({ success: false, message: "Missing data" });
     }
 
     // 🔒 Normalize receipt
     receipt = receipt.trim().toUpperCase();
 
-    // 🔒 Validate format (M-Pesa code)
-    if (!/^[A-Z0-9]{8,12}$/.test(receipt)) {
-      return res.json({ success: false, message: "Invalid receipt format" });
+    // 🔒 Strict format check (M-Pesa codes are usually 10 chars)
+    if (!/^[A-Z0-9]{10,12}$/.test(receipt)) {
+      return res.json({ success: false, message: "Invalid M-Pesa code" });
     }
 
-    // 🚫 Prevent reuse
+    // 🚫 Prevent reuse of receipt
     const existing = await pool.query(
-      "SELECT * FROM transactions WHERE mpesa_receipt=$1",
+      "SELECT id FROM transactions WHERE mpesa_receipt=$1",
       [receipt]
     );
 
@@ -193,20 +194,23 @@ app.post("/manual-verify", async (req, res) => {
       return res.json({ success: false, message: "Receipt already used" });
     }
 
-    // ✅ Update transaction SAFELY
+    // 🔒 MATCH FULL TRANSACTION (CRITICAL SECURITY)
     const resultUpdate = await pool.query(
       `UPDATE transactions
        SET status='Success', mpesa_receipt=$1
-       WHERE ref=$2 AND status != 'Success'
+       WHERE ref=$2
+       AND phone=$3
+       AND amount=$4
+       AND status IN ('Pending','ManualRequired','Timeout')
        RETURNING *`,
-      [receipt, ref]
+      [receipt, ref, phone, amount]
     );
 
-    // ❌ If nothing updated
+    // ❌ If nothing updated → mismatch or already completed
     if (!resultUpdate.rows.length) {
       return res.json({
         success: false,
-        message: "Transaction not found or already completed"
+        message: "Transaction mismatch or already completed"
       });
     }
 

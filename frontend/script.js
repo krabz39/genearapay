@@ -77,20 +77,23 @@ async function smartCheckStatus(ref, phone, amount) {
     }
 
     // 🔥 AUTO SWITCH TO MANUAL
-    else if (
-      data.status === "ManualRequired" ||
-      data.status === "Timeout" ||
-      attempts >= 5
-    ) {
-      clearInterval(interval);
+  else if (
+  data.status === "ManualRequired" ||
+  data.status === "Timeout" ||
+  attempts >= 10
+) {
+  clearInterval(interval);
 
-      showReceipt(
-        { mpesaReceipt: null, qr: null },
-        ref,
-        phone,
-        amount,
-        "TIMEOUT"
-      );
+  // 🔥 FORCE MANUAL MODE
+  document.getElementById("manualInstructions").style.display = "block";
+
+  showReceipt(
+    data,
+    ref,
+    phone,
+    amount,
+    "ManualRequired"
+  );
 
       document.getElementById("manualInstructions").style.display = "block";
     }
@@ -98,26 +101,41 @@ async function smartCheckStatus(ref, phone, amount) {
   }, 3000);
 }
 function showReceipt(data, ref, phone, amount, status) {
-  document.getElementById("emptyState").style.display = "none";
-  const receipt = document.getElementById("receiptBox");
-receipt.classList.remove("hidden");
-receipt.style.display = "block"; // 🔥 FORCE VISIBILITY
+  const icon = document.getElementById("statusIcon");
+  const title = document.getElementById("receiptTitle");
+  const sub = document.getElementById("receiptSub");
 
-  const date = new Date().toLocaleString();
+  // 🎯 STATUS UI
+  if (status === "SUCCESS") {
+    icon.innerText = "✅";
+    title.innerText = "Payment Successful";
+    sub.innerText = "Transaction completed successfully";
+  } 
+  else if (status === "FAILED") {
+    icon.innerText = "❌";
+    title.innerText = "Payment Failed";
+    sub.innerText = "Something went wrong";
+  } 
+  else if (status === "ManualRequired") {
+    icon.innerText = "⚠️";
+    title.innerText = "Manual Payment Required";
+    sub.innerText = "Complete via M-Pesa and confirm below";
+  } 
+  else {
+    icon.innerText = "⏳";
+    title.innerText = "Processing Payment";
+    sub.innerText = "Waiting for M-Pesa prompt...";
+  }
 
   document.getElementById("rAmount").innerText = "KES " + amount;
   document.getElementById("rPhone").innerText = phone;
-  document.getElementById("rReceipt").innerText =
-    data.mpesaReceipt || "-";
-  document.getElementById("rDate").innerText = date;
+  document.getElementById("rReceipt").innerText = data.mpesaReceipt || "-";
   document.getElementById("rRef").innerText = ref;
+  document.getElementById("rStatus").innerText = status;
 
-  const verify = `https://genearapay.onrender.com/verify/${ref}`;
-  document.getElementById("verifyLink").innerText = verify;
-
-  if (data.qr) {
-    document.getElementById("qr").src = data.qr;
-  }
+  const verifyUrl = `https://genearapay.onrender.com/verify/${ref}`;
+  document.getElementById("verifyLink").innerText = verifyUrl;
+}
 
   const statusEl = document.getElementById("rStatus");
 const manualBtn = document.getElementById("manualPayBtn");
@@ -171,7 +189,7 @@ else {
 
   manualBtn.style.display = "block";
   instructions.style.display = "block";
-}}
+}
 async function manualVerify() {
   const ref = document.getElementById("rRef").innerText;
   let receipt = document.getElementById("manualReceipt").value;
